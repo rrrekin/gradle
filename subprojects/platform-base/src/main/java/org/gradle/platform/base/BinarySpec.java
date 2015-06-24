@@ -21,8 +21,6 @@ import org.gradle.internal.HasInternalProtocol;
 import org.gradle.language.base.LanguageSourceSet;
 import org.gradle.model.ModelMap;
 
-import java.util.Set;
-
 /**
  * Represents a binary artifact that is the result of building a project component.
  */
@@ -40,12 +38,20 @@ public interface BinarySpec extends BuildableModelElement, Named {
 
     /**
      * The source sets used to compile this binary.
+     *
+     * @deprecated Use {@link #getSources()} or {@link #getInputs()} instead.
      */
+    @Deprecated
     DomainObjectSet<LanguageSourceSet> getSource();
 
+    /**
+     * The sources owned by this binary.
+     *
+     * @return the sources owned by the binary.
+     */
     ModelMap<LanguageSourceSet> getSources();
 
-    Set<LanguageSourceSet> getInputs();
+    DomainObjectSet<LanguageSourceSet> getInputs();
 
     /**
      * Configures the source sets used to build this binary.

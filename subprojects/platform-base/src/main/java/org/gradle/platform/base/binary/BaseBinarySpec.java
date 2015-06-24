@@ -16,7 +16,6 @@
 
 package org.gradle.platform.base.binary;
 
-import com.google.common.collect.Sets;
 import org.gradle.api.Action;
 import org.gradle.api.DomainObjectSet;
 import org.gradle.api.Incubating;
@@ -51,7 +50,8 @@ import java.util.Set;
 @Incubating
 public abstract class BaseBinarySpec extends AbstractBuildableModelElement implements BinarySpecInternal {
     private FunctionalSourceSet mainSources;
-    private ModelMap<LanguageSourceSet> ownedSources;
+    private ModelMap<LanguageSourceSet> sources;
+    private DomainObjectSet<LanguageSourceSet> inputs = new DefaultDomainObjectSet<LanguageSourceSet>(LanguageSourceSet.class);
 
     private static ThreadLocal<BinaryInfo> nextBinaryInfo = new ThreadLocal<BinaryInfo>();
     private final BinaryTasksCollection tasks;
@@ -113,10 +113,18 @@ public abstract class BaseBinarySpec extends AbstractBuildableModelElement imple
 
     public void setBinarySources(FunctionalSourceSet sources) {
         mainSources = sources;
-        ownedSources = DomainObjectCollectionBackedModelMap.wrap(LanguageSourceSet.class, sources, sources.getEntityInstantiator(), sources.getNamer(), Actions.doNothing());
+        this.sources = new DomainObjectCollectionBackedModelMap<LanguageSourceSet>(LanguageSourceSet.class, sources, sources.getEntityInstantiator(), sources.getNamer(), Actions.doNothing());
+        sources.whenObjectAdded(new Action<LanguageSourceSet>() {
+            @Override
+            public void execute(LanguageSourceSet sourceSet) {
+                inputs.add(sourceSet);
+            }
+        });
+        inputs.addAll(sources);
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public DomainObjectSet<LanguageSourceSet> getSource() {
         return new DefaultDomainObjectSet<LanguageSourceSet>(LanguageSourceSet.class, mainSources);
     }
@@ -126,18 +134,19 @@ public abstract class BaseBinarySpec extends AbstractBuildableModelElement imple
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public Set<LanguageSourceSet> getAllSources() {
         return getInputs();
     }
 
     @Override
-    public Set<LanguageSourceSet> getInputs() {
-        return Sets.newLinkedHashSet(mainSources);
+    public DomainObjectSet<LanguageSourceSet> getInputs() {
+        return inputs;
     }
 
     @Override
     public ModelMap<LanguageSourceSet> getSources() {
-        return ownedSources;
+        return sources;
     }
 
     @Override

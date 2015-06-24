@@ -16,6 +16,7 @@
 
 package org.gradle.ide.visualstudio.internal
 
+import org.gradle.api.internal.DefaultDomainObjectSet
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.internal.reflect.DirectInstantiator
 import org.gradle.language.base.LanguageSourceSet
@@ -24,7 +25,7 @@ import org.gradle.nativeplatform.internal.NativeExecutableBinarySpecInternal
 import spock.lang.Specification
 
 class VisualStudioProjectRegistryTest extends Specification {
-    private Set<LanguageSourceSet> sources = [] as Set
+    private Set<LanguageSourceSet> sources = new DefaultDomainObjectSet<>(LanguageSourceSet)
     def fileResolver = Mock(FileResolver)
     def visualStudioProjectMapper = Mock(VisualStudioProjectMapper)
     def registry = new VisualStudioProjectRegistry(fileResolver, visualStudioProjectMapper, DirectInstantiator.INSTANCE)
@@ -92,8 +93,8 @@ class VisualStudioProjectRegistryTest extends Specification {
         when:
         visualStudioProjectMapper.mapToConfiguration(executableBinary1) >> new VisualStudioProjectMapper.ProjectConfigurationNames("vsProject", "vsConfig1", "vsPlatform")
         visualStudioProjectMapper.mapToConfiguration(executableBinary2) >> new VisualStudioProjectMapper.ProjectConfigurationNames("vsProject", "vsConfig2", "vsPlatform")
-        executableBinary1.inputs >> ([sourceCommon, source1] as Set)
-        executableBinary2.inputs >> ([sourceCommon, source2] as Set)
+        executableBinary1.inputs >> new DefaultDomainObjectSet<LanguageSourceSet>(LanguageSourceSet, [sourceCommon, source1])
+        executableBinary2.inputs >> new DefaultDomainObjectSet<LanguageSourceSet>(LanguageSourceSet, [sourceCommon, source2])
 
         and:
         registry.addProjectConfiguration(executableBinary1)
