@@ -119,12 +119,6 @@ public abstract class BaseBinarySpec extends AbstractBuildableModelElement imple
         referencedSourceSets.addAll(componentSources);
     }
 
-    @Override
-    @SuppressWarnings("deprecation")
-    public DomainObjectSet<LanguageSourceSet> getSource() {
-        return new DefaultDomainObjectSet<LanguageSourceSet>(LanguageSourceSet.class, ownedSourceSets.values());
-    }
-
     public void sources(Action<? super ModelMap<LanguageSourceSet>> action) {
         action.execute(getSources());
     }
@@ -140,6 +134,12 @@ public abstract class BaseBinarySpec extends AbstractBuildableModelElement imple
     @Override
     public ModelMap<LanguageSourceSet> getSources() {
         return ownedSourceSets;
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public DomainObjectSet<LanguageSourceSet> getSource() {
+        return getInputs();
     }
 
     public BinaryTasksCollection getTasks() {
