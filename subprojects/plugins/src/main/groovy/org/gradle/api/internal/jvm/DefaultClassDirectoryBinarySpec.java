@@ -28,6 +28,7 @@ import org.gradle.jvm.platform.JavaPlatform;
 import org.gradle.jvm.toolchain.JavaToolChain;
 import org.gradle.language.base.FunctionalSourceSet;
 import org.gradle.language.base.LanguageSourceSet;
+import org.gradle.model.ModelMap;
 import org.gradle.platform.base.BinaryTasksCollection;
 import org.gradle.platform.base.internal.*;
 import org.gradle.platform.base.internal.toolchain.ToolResolver;
@@ -148,7 +149,9 @@ public class DefaultClassDirectoryBinarySpec extends AbstractBuildableModelEleme
         return sourceSets;
     }
 
-    public void source(LanguageSourceSet source) {
+    @Override
+    public ModelMap<LanguageSourceSet> getSources() {
+        // TODO:LPTR This should return something usable
         throw new UnsupportedOperationException();
     }
 
