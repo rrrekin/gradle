@@ -26,8 +26,6 @@ import java.util.Set;
 public interface BinarySpecInternal extends BinarySpec {
     ModelType<BinarySpec> PUBLIC_MODEL_TYPE = ModelType.of(BinarySpec.class);
 
-    void addSourceSet(LanguageSourceSet sourceSet);
-
     void setBinarySources(FunctionalSourceSet sources);
 
     void setBuildable(boolean buildable);
