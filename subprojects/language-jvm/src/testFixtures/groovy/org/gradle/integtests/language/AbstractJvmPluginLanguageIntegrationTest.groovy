@@ -68,7 +68,7 @@ abstract class AbstractJvmPluginLanguageIntegrationTest extends AbstractIntegrat
                     assert project.sources as Set == myLib.sources as Set
 
                     project.binaries.withType(JarBinarySpec) { jvmBinary ->
-                        assert jvmBinary.source.toList() == myLib.source.values().toList()
+                        assert jvmBinary.source as Set == myLib.source.values() as Set
                     }
                 }
             }
@@ -110,7 +110,7 @@ abstract class AbstractJvmPluginLanguageIntegrationTest extends AbstractIntegrat
                     assert project.sources as Set == myLib.sources as Set
 
                     project.binaries.withType(JarBinarySpec) { jvmBinary ->
-                        assert jvmBinary.source.toList() == myLib.source.values().toList()
+                        assert jvmBinary.source as Set == myLib.source.values() as Set
                     }
                 }
             }
