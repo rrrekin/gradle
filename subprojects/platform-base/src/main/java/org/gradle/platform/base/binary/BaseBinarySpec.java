@@ -19,7 +19,6 @@ package org.gradle.platform.base.binary;
 import org.gradle.api.Action;
 import org.gradle.api.DomainObjectSet;
 import org.gradle.api.Incubating;
-import org.gradle.api.PolymorphicDomainObjectContainer;
 import org.gradle.api.internal.AbstractBuildableModelElement;
 import org.gradle.api.internal.DefaultDomainObjectSet;
 import org.gradle.api.internal.project.taskfactory.ITaskFactory;
@@ -36,8 +35,6 @@ import org.gradle.platform.base.internal.BinaryBuildAbility;
 import org.gradle.platform.base.internal.BinarySpecInternal;
 import org.gradle.platform.base.internal.DefaultBinaryTasksCollection;
 import org.gradle.platform.base.internal.FixedBuildAbility;
-
-import java.util.Set;
 
 /**
  * Base class for custom binary implementations.
@@ -129,14 +126,8 @@ public abstract class BaseBinarySpec extends AbstractBuildableModelElement imple
         return new DefaultDomainObjectSet<LanguageSourceSet>(LanguageSourceSet.class, mainSources);
     }
 
-    public void sources(Action<? super PolymorphicDomainObjectContainer<LanguageSourceSet>> action) {
-        action.execute(mainSources);
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public Set<LanguageSourceSet> getAllSources() {
-        return getInputs();
+    public void sources(Action<? super ModelMap<LanguageSourceSet>> action) {
+        action.execute(getSources());
     }
 
     @Override
