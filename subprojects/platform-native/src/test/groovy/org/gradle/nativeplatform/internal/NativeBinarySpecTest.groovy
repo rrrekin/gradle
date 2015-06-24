@@ -84,7 +84,7 @@ class NativeBinarySpecTest extends Specification {
         functionalSourceSet.add(sourceSet2)
 
         and:
-        binary.binarySources = functionalSourceSet
+        binary.sourcesFromComponent = functionalSourceSet
 
         then:
         binary.sources.containsValue(sourceSet1)

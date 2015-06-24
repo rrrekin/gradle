@@ -59,7 +59,7 @@ public abstract class BaseComponentSpec implements ComponentSpecInternal {
             FunctionalSourceSet componentSources = ModelViews.getInstance(views.get(0), FunctionalSourceSet.class);
             BinarySpecInternal binarySpecInternal = Cast.uncheckedCast(binarySpec);
             FunctionalSourceSet binarySources = componentSources.copy(binarySpec.getName());
-            binarySpecInternal.setBinarySources(binarySources);
+            binarySpecInternal.setSourcesFromComponent(binarySources);
         }
     };
 

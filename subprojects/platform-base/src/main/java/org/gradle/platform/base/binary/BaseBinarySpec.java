@@ -112,7 +112,7 @@ public abstract class BaseBinarySpec extends AbstractBuildableModelElement imple
     }
 
     // TODO:DAZ This is really doing 2 things: 1) copying the referenced source sets, and 2) providing the factories for creating new owned source sets
-    public void setBinarySources(FunctionalSourceSet componentSources) {
+    public void setSourcesFromComponent(FunctionalSourceSet componentSources) {
         NamedEntityInstantiator<LanguageSourceSet> sourceSetInstantiator = componentSources.getEntityInstantiator();
         ownedSourceSets = new DomainObjectCollectionBackedModelMap<LanguageSourceSet>(LanguageSourceSet.class, new DefaultDomainObjectSet<LanguageSourceSet>(LanguageSourceSet.class), sourceSetInstantiator, new Namer(), Actions.doNothing());
 
