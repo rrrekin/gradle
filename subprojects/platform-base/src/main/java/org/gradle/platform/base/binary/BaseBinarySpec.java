@@ -30,6 +30,7 @@ import org.gradle.language.base.FunctionalSourceSet;
 import org.gradle.language.base.LanguageSourceSet;
 import org.gradle.model.ModelMap;
 import org.gradle.model.internal.core.DomainObjectCollectionBackedModelMap;
+import org.gradle.model.internal.core.ModelMapGroovyDecorator;
 import org.gradle.model.internal.core.NamedEntityInstantiator;
 import org.gradle.platform.base.BinaryTasksCollection;
 import org.gradle.platform.base.ModelInstantiationException;
@@ -133,7 +134,7 @@ public abstract class BaseBinarySpec extends AbstractBuildableModelElement imple
 
     @Override
     public ModelMap<LanguageSourceSet> getSources() {
-        return ownedSourceSets;
+        return ModelMapGroovyDecorator.wrap(ownedSourceSets);
     }
 
     @Override
