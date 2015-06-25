@@ -15,7 +15,10 @@
  */
 package org.gradle.language.base.plugins;
 
-import org.gradle.api.*;
+import org.gradle.api.Incubating;
+import org.gradle.api.NamedDomainObjectFactory;
+import org.gradle.api.Plugin;
+import org.gradle.api.Task;
 import org.gradle.api.internal.project.ProjectInternal;
 import org.gradle.api.internal.rules.ModelMapCreators;
 import org.gradle.api.internal.rules.NamedDomainObjectFactoryRegistry;
@@ -29,6 +32,7 @@ import org.gradle.language.base.ProjectSourceSet;
 import org.gradle.language.base.internal.LanguageSourceSetInternal;
 import org.gradle.language.base.internal.SourceTransformTaskConfig;
 import org.gradle.language.base.internal.model.BinarySpecFactoryRegistry;
+import org.gradle.language.base.internal.model.ComponentBinaryRules;
 import org.gradle.language.base.internal.model.ComponentRules;
 import org.gradle.language.base.internal.registry.*;
 import org.gradle.model.*;
@@ -83,6 +87,7 @@ public class ComponentModelBasePlugin implements Plugin<ProjectInternal> {
         );
         modelRegistry.create(componentsCreator);
         modelRegistry.getRoot().applyToAllLinksTransitive(ModelType.of(ComponentSpec.class), ComponentRules.class);
+        modelRegistry.getRoot().applyToAllLinksTransitive(ModelType.of(ComponentSpec.class), ComponentBinaryRules.class);
     }
 
     @SuppressWarnings("UnusedDeclaration")
@@ -188,6 +193,22 @@ public class ComponentModelBasePlugin implements Plugin<ProjectInternal> {
                 for (BinarySpec binary : componentSpec.getBinaries().values()) {
                     binaries.add(binary);
                 }
+            }
+        }
+
+        @Finalize
+        void addComponentSourceSetsToBinaries(ComponentSpecContainer componentSpecs) {
+            for (ComponentSpec componentSpec : componentSpecs.values()) {
+                for (BinarySpec binary : componentSpec.getBinaries().values()) {
+                    binary.getInputs().addAll(componentSpec.getSource().values());
+                }
+            }
+        }
+
+        @Finalize
+        void addSourceSetsOwnedByBinariesToTheirInputs(BinaryContainer binarySpecs) {
+            for (BinarySpec binary : binarySpecs) {
+                binary.getInputs().addAll(binary.getSources().values());
             }
         }
     }
