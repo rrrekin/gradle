@@ -293,6 +293,7 @@ public class NodeBackedModelMap<T> implements ModelMap<T>, ManagedInstance {
 
     @Override
     public Iterator<T> iterator() {
+        viewState.assertCanReadChildren();
         return Iterators.transform(keySet().iterator(), new Function<String, T>() {
             @Override
             public T apply(@Nullable String name) {
