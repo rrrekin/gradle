@@ -160,6 +160,7 @@ public class DomainObjectCollectionBackedModelMap<T> implements ModelMap<T> {
         S s = instantiator.create(name, type);
         configAction.execute(s);
         onCreateAction.execute(s);
+        collection.add(s);
     }
 
     @Override
