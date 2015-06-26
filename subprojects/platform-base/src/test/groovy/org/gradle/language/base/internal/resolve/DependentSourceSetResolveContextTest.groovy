@@ -17,6 +17,7 @@
 package org.gradle.language.base.internal.resolve
 import org.gradle.api.artifacts.component.LibraryComponentIdentifier
 import org.gradle.language.base.internal.DependentSourceSetInternal
+import org.gradle.platform.base.Platform
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -30,7 +31,7 @@ class DependentSourceSetResolveContextTest extends Specification {
         def sourceset = Mock(DependentSourceSetInternal)
 
         when:
-        def context = new DependentSourceSetResolveContext(project, COMPONENT_NAME, VARIANT, sourceset)
+        def context = new DependentSourceSetResolveContext(project, COMPONENT_NAME, VARIANT, sourceset, Mock(Platform))
 
         then:
         context.projectPath == project
@@ -46,7 +47,7 @@ class DependentSourceSetResolveContextTest extends Specification {
 
         when:
         sourceset.parentName >> library
-        def context = new DependentSourceSetResolveContext(path, COMPONENT_NAME, VARIANT, sourceset)
+        def context = new DependentSourceSetResolveContext(path, COMPONENT_NAME, VARIANT, sourceset, Mock(Platform))
 
         then:
         context.projectPath == path

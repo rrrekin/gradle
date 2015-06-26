@@ -104,11 +104,15 @@ public class DefaultDependencyResolver implements ArtifactDependencyResolver {
                 ResolutionStrategyInternal resolutionStrategy = (ResolutionStrategyInternal) resolveContext.getResolutionStrategy();
 
                 List<LocalComponentConverter> localComponentFactories = allServices(LocalComponentConverter.class);
-                List<ResolverProvider> resolvers = allServices(ResolverProvider.class, ivyFactory.create(resolutionStrategy, repositories, metadataHandler.getComponentMetadataProcessor()));
+                List<ResolverProvider> resolvers = allServices(ResolverProvider.class);
                 List<RequestScopeResolverProviderFactory.Query> requestScopeProviderQueries = allServices(RequestScopeResolverProviderFactory.Query.class);
                 for (RequestScopeResolverProviderFactory.Query query : requestScopeProviderQueries) {
-                    resolvers.add(requestScopeResolverProviderFactory.create(resolveContext, query));
+                    ResolverProvider provider = requestScopeResolverProviderFactory.tryCreate(resolveContext, query);
+                    if (provider!=null) {
+                        resolvers.add(provider);
+                    }
                 }
+                resolvers.add(ivyFactory.create(resolutionStrategy, repositories, metadataHandler.getComponentMetadataProcessor()));
                 ResolverProviderChain resolverProvider = new ResolverProviderChain(resolvers);
                 ResolverProvider wrappingProvider = DelegatingResolverProvider.of(
                     createArtifactResolver(resolverProvider.getArtifactResolver()),

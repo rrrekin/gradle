@@ -31,6 +31,7 @@ import org.gradle.internal.resolve.result.DefaultBuildableArtifactResolveResult
 import org.gradle.internal.resolve.result.DefaultBuildableArtifactSetResolveResult
 import org.gradle.internal.resolve.result.DefaultBuildableComponentIdResolveResult
 import org.gradle.jvm.JvmLibrarySpec
+import org.gradle.jvm.platform.JavaPlatform
 import org.gradle.model.ModelMap
 import org.gradle.model.internal.registry.ModelRegistry
 import org.gradle.platform.base.BinarySpec
@@ -59,7 +60,7 @@ class LocalLibraryDependencyResolverTest extends Specification {
         }
         locator = new DefaultProjectLocator(finder)
         rootProject = mockProject(':')
-        resolver = new LocalLibraryDependencyResolver(locator)
+        resolver = new LocalLibraryDependencyResolver(locator, Mock(JavaPlatform))
         metadata = Mock(DependencyMetaData)
         selector = Mock(LibraryComponentSelector)
         requested = Mock(ModuleVersionSelector)

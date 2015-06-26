@@ -32,12 +32,29 @@ class RequestScopeResolverProviderFactoryTest extends Specification {
         def instantiator = Mock(Instantiator)
         instantiator.newInstance(_, _) >> Mock(ResolverProvider)
         def factory = new RequestScopeResolverProviderFactory(instantiator)
+        def mock = Mock(RequestScopeResolverProviderFactory.Query)
+        mock.canCreateFrom(_) >> true
 
         when: "we call the create method using a resolve context"
-        def resolver = factory.create(Mock(ResolveContext), Mock(RequestScopeResolverProviderFactory.Query))
+        def resolver = factory.tryCreate(Mock(ResolveContext), mock)
 
         then: "a resolver provider is returned"
         resolver != null
+    }
+
+    def "cannot create a ResolverProvider using the factory if resolve context is not supported"() {
+        given: "a factory of resolver providers"
+        def instantiator = Mock(Instantiator)
+        instantiator.newInstance(_, _) >> Mock(ResolverProvider)
+        def factory = new RequestScopeResolverProviderFactory(instantiator)
+        def mock = Mock(RequestScopeResolverProviderFactory.Query)
+        mock.canCreateFrom(_) >> false
+
+        when: "we call the create method using a resolve context"
+        def resolver = factory.tryCreate(Mock(ResolveContext), mock)
+
+        then: "a resolver provider is not returned"
+        resolver == null
     }
 
     @Unroll
@@ -53,7 +70,7 @@ class RequestScopeResolverProviderFactoryTest extends Specification {
         )
 
         def context = Mock(ResolveContext)
-        def resolver = factory.create(context, query)
+        def resolver = factory.tryCreate(context, query)
 
         then: "a resolver provider is returned"
         resolver != null

@@ -41,6 +41,7 @@ import org.gradle.internal.resolve.result.BuildableComponentIdResolveResult;
 import org.gradle.internal.resolve.result.BuildableComponentResolveResult;
 import org.gradle.jvm.JvmBinarySpec;
 import org.gradle.jvm.JvmLibrarySpec;
+import org.gradle.jvm.platform.JavaPlatform;
 import org.gradle.jvm.tasks.Jar;
 import org.gradle.language.base.internal.model.DefaultLibraryLocalComponentMetaData;
 import org.gradle.language.base.internal.resolve.LibraryResolveException;
@@ -58,9 +59,11 @@ import java.util.*;
 // point, and for now it is hardcoded to JVM libraries
 public class LocalLibraryDependencyResolver implements DependencyToComponentIdResolver, ComponentMetaDataResolver, ArtifactResolver {
     private final ProjectLocator projectLocator;
+    private final JavaPlatform javaPlatform;
 
-    public LocalLibraryDependencyResolver(ProjectLocator projectLocator) {
+    public LocalLibraryDependencyResolver(ProjectLocator projectLocator, JavaPlatform platform) {
         this.projectLocator = projectLocator;
+        this.javaPlatform = platform;
     }
 
     @Override

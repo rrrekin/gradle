@@ -20,6 +20,7 @@ import org.gradle.api.artifacts.component.LibraryComponentIdentifier
 import org.gradle.internal.component.model.ComponentResolveMetaData
 import org.gradle.language.base.internal.DependentSourceSetInternal
 import org.gradle.platform.base.DependencySpecContainer
+import org.gradle.platform.base.Platform
 import org.gradle.platform.base.internal.DefaultDependencySpec
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -28,7 +29,7 @@ class DependentSourceSetLocalComponentConverterTest extends Specification {
 
     def "can convert dependent source set resolve context"() {
         given:
-        def context = new DependentSourceSetResolveContext(':foo', 'myLib', 'api', Mock(DependentSourceSetInternal))
+        def context = new DependentSourceSetResolveContext(':foo', 'myLib', 'api', Mock(DependentSourceSetInternal), Mock(Platform))
 
         when:
         def factory = new DependentSourceSetLocalComponentConverter()
@@ -47,7 +48,7 @@ class DependentSourceSetLocalComponentConverterTest extends Specification {
         dependencySpecs.iterator() >> { [].iterator() }
         sourceSet.dependencies >> dependencySpecs
 
-        def context = new DependentSourceSetResolveContext(project, 'myLib', 'api', sourceSet)
+        def context = new DependentSourceSetResolveContext(project, 'myLib', 'api', sourceSet, Mock(Platform))
 
         when: "we create a local component factory"
         def factory = new DependentSourceSetLocalComponentConverter()
@@ -87,7 +88,7 @@ class DependentSourceSetLocalComponentConverterTest extends Specification {
 
         sourceSet.dependencies >> dependencySpecs
 
-        def context = new DependentSourceSetResolveContext(project, 'myLib', 'api', sourceSet)
+        def context = new DependentSourceSetResolveContext(project, 'myLib', 'api', sourceSet, Mock(Platform))
 
         when: "we create a local component factory"
         def factory = new DependentSourceSetLocalComponentConverter()

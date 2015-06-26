@@ -16,6 +16,7 @@
 package org.gradle.api.internal.artifacts.ivyservice.ivyresolve;
 
 import com.google.common.collect.Lists;
+import org.gradle.api.Nullable;
 import org.gradle.api.internal.artifacts.ResolveContext;
 import org.gradle.internal.reflect.Instantiator;
 
@@ -26,9 +27,13 @@ public class RequestScopeResolverProviderFactory {
         this.instantiator = instantiator;
     }
 
-    public ResolverProvider create(ResolveContext resolveContext, Query query) {
-        Object[] parameters = query.constructorArgs == null ? new Object[]{resolveContext} : Lists.asList(resolveContext, query.constructorArgs).toArray();
-        return instantiator.newInstance(query.providerClass, parameters);
+    @Nullable
+    public ResolverProvider tryCreate(ResolveContext resolveContext, Query query) {
+        if (query.canCreateFrom(resolveContext)) {
+            Object[] parameters = query.constructorArgs == null ? new Object[]{resolveContext} : Lists.asList(resolveContext, query.constructorArgs).toArray();
+            return instantiator.newInstance(query.providerClass, parameters);
+        }
+        return null;
     }
 
     /**
@@ -41,6 +46,10 @@ public class RequestScopeResolverProviderFactory {
         public Query(Class<? extends ResolverProvider> providerClass, Object... constructorArgs) {
             this.providerClass = providerClass;
             this.constructorArgs = constructorArgs;
+        }
+
+        public boolean canCreateFrom(ResolveContext context) {
+            return true;
         }
     }
 }
