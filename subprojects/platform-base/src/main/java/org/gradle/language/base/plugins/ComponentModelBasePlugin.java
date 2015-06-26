@@ -15,10 +15,7 @@
  */
 package org.gradle.language.base.plugins;
 
-import org.gradle.api.Incubating;
-import org.gradle.api.NamedDomainObjectFactory;
-import org.gradle.api.Plugin;
-import org.gradle.api.Task;
+import org.gradle.api.*;
 import org.gradle.api.internal.project.ProjectInternal;
 import org.gradle.api.internal.rules.ModelMapCreators;
 import org.gradle.api.internal.rules.NamedDomainObjectFactoryRegistry;
@@ -198,10 +195,13 @@ public class ComponentModelBasePlugin implements Plugin<ProjectInternal> {
 
         @Finalize
         void addComponentSourceSetsToBinaries(ComponentSpecContainer componentSpecs) {
-            for (ComponentSpec componentSpec : componentSpecs.values()) {
-                for (BinarySpec binary : componentSpec.getBinaries().values()) {
-                    binary.getInputs().addAll(componentSpec.getSource().values());
-                }
+            for (final ComponentSpec componentSpec : componentSpecs.values()) {
+                componentSpec.getBinaries().beforeEach(new Action<BinarySpec>() {
+                    @Override
+                    public void execute(BinarySpec binary) {
+                        binary.getInputs().addAll(componentSpec.getSource().values());
+                    }
+                });
             }
         }
 
