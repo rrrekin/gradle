@@ -16,6 +16,7 @@
 
 package org.gradle.api.internal.resolve
 
+import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.ModuleVersionSelector
@@ -30,11 +31,14 @@ import org.gradle.internal.component.model.*
 import org.gradle.internal.resolve.result.DefaultBuildableArtifactResolveResult
 import org.gradle.internal.resolve.result.DefaultBuildableArtifactSetResolveResult
 import org.gradle.internal.resolve.result.DefaultBuildableComponentIdResolveResult
+import org.gradle.jvm.JvmBinarySpec
+import org.gradle.jvm.JvmBinaryTasks
 import org.gradle.jvm.JvmLibrarySpec
 import org.gradle.jvm.platform.JavaPlatform
+import org.gradle.jvm.platform.internal.DefaultJavaPlatform
+import org.gradle.jvm.tasks.Jar
 import org.gradle.model.ModelMap
 import org.gradle.model.internal.registry.ModelRegistry
-import org.gradle.platform.base.BinarySpec
 import org.gradle.platform.base.ComponentSpecContainer
 import org.gradle.platform.base.LibrarySpec
 import spock.lang.Specification
@@ -50,6 +54,7 @@ class LocalLibraryDependencyResolverTest extends Specification {
     DependencyMetaData metadata
     LibraryComponentSelector selector
     ModuleVersionSelector requested
+    JavaPlatform platform
 
     def setup() {
         projects = [:]
@@ -60,7 +65,8 @@ class LocalLibraryDependencyResolverTest extends Specification {
         }
         locator = new DefaultProjectLocator(finder)
         rootProject = mockProject(':')
-        resolver = new LocalLibraryDependencyResolver(locator, Mock(JavaPlatform))
+        platform = new DefaultJavaPlatform(JavaVersion.current())
+        resolver = new LocalLibraryDependencyResolver(locator, platform)
         metadata = Mock(DependencyMetaData)
         selector = Mock(LibraryComponentSelector)
         requested = Mock(ModuleVersionSelector)
@@ -208,9 +214,13 @@ class LocalLibraryDependencyResolverTest extends Specification {
                 lib.name >> it
                 def binaries = Mock(ModelMap)
                 binaries.values() >> {
-                    def binary = Mock(BinarySpec)
+                    def binary = Mock(JvmBinarySpec)
                     binary.name >> 'api'
                     binary.buildTask >> Mock(Task)
+                    binary.targetPlatform >> platform
+                    def tasks = Mock(JvmBinaryTasks)
+                    tasks.jar >> Mock(Jar)
+                    binary.tasks >> tasks
                     [binary]
                 }
                 lib.binaries >> binaries

@@ -16,6 +16,8 @@
 
 package org.gradle.language.java
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
+import org.gradle.util.Requires
+import org.gradle.util.TestPrecondition
 
 class JavaLanguageDependencyResolutionIntegrationTest extends AbstractIntegrationSpec {
 
@@ -756,39 +758,6 @@ model {
 
     }
 
-    def "should fail resolution if more than one binary is available"() {
-        given:
-        applyJavaPlugin(buildFile)
-        buildFile << '''
-model {
-    components {
-        zdep(JvmLibrarySpec) {
-            targetPlatform 'java6'
-            targetPlatform 'java7'
-        }
-
-        main(JvmLibrarySpec) {
-            sources {
-                java {
-                    dependencies {
-                        library 'zdep'
-                    }
-                }
-            }
-        }
-    }
-}
-'''
-        file('src/zdep/java/Dep.java') << 'public class Dep {}'
-        file('src/main/java/TestApp.java') << 'public class TestApp extends Dep {}'
-
-        when:
-        fails ':mainJar'
-
-        then:
-        failure.assertHasCause("Multiple binaries available for library 'zdep'")
-    }
-
     def "fails if a dependency is not a JvmLibrarySpec library"() {
         given:
         applyJavaPlugin(buildFile)
@@ -953,6 +922,7 @@ model {
         succeeds 'java7MainJar'
     }
 
+    @Requires(TestPrecondition.JDK8_OR_LATER)
     def "should not choose higher version than available"() {
         given:
         applyJavaPlugin(buildFile)
@@ -996,6 +966,39 @@ model {
 
         and:
         succeeds 'java7MainJar'
+    }
+
+    def "should display candidate platforms if no one matches"() {
+        given:
+        applyJavaPlugin(buildFile)
+        buildFile << '''
+model {
+    components {
+        dep(JvmLibrarySpec) {
+            targetPlatform 'java7'
+        }
+
+        main(JvmLibrarySpec) {
+            targetPlatform 'java6'
+            sources {
+                java {
+                    dependencies {
+                        library 'dep'
+                    }
+                }
+            }
+        }
+    }
+}
+'''
+        file('src/dep/java/Dep.java') << 'public class Dep {}'
+        file('src/main/java/TestApp.java') << 'public class TestApp extends Dep {}'
+
+        when:
+        fails 'mainJar'
+
+        then:
+        failure.assertHasCause("Cannot find a compatible binary for library 'dep' (Java SE 6). Available platforms: [Java SE 7]")
     }
 
     void applyJavaPlugin(File buildFile) {
