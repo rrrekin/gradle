@@ -20,6 +20,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
+import com.google.common.collect.TreeMultimap;
 import org.gradle.api.artifacts.PublishArtifact;
 import org.gradle.api.artifacts.component.ComponentIdentifier;
 import org.gradle.api.artifacts.component.LibraryComponentIdentifier;
@@ -77,7 +78,8 @@ public class LocalLibraryDependencyResolver implements DependencyToComponentIdRe
             LibrarySpec selectedLibrary = resolutionResult.getSelectedLibrary();
             if (selectedLibrary != null) {
                 DefaultTaskDependency buildDependencies = new DefaultTaskDependency();
-                Collection<BinarySpec> variants = selectedLibrary.getBinaries().values();
+                Collection<BinarySpec> allVariants = selectedLibrary.getBinaries().values();
+                Collection<? extends BinarySpec> variants = filterBinaries(allVariants);
                 if (variants.size() > 1) {
                     result.failed(new ModuleVersionResolveException(selector, String.format("Multiple binaries available for library '%s' : %s", libraryName, variants)));
                 } else {
@@ -100,6 +102,36 @@ public class LocalLibraryDependencyResolver implements DependencyToComponentIdRe
                 result.failed(failure);
             }
         }
+    }
+
+    private Collection<? extends BinarySpec> filterBinaries(Collection<BinarySpec> values) {
+        if (values.isEmpty()) {
+            return values;
+        }
+        TreeMultimap<JavaPlatform, JvmBinarySpec> platformToBinary = TreeMultimap.create(new Comparator<JavaPlatform>() {
+            @Override
+            public int compare(JavaPlatform o1, JavaPlatform o2) {
+                return o1.getTargetCompatibility().compareTo(o2.getTargetCompatibility());
+            }
+        }, new Comparator<JvmBinarySpec>() {
+            @Override
+            public int compare(JvmBinarySpec o1, JvmBinarySpec o2) {
+                return o1.getTargetPlatform().getTargetCompatibility().compareTo(o2.getTargetPlatform().getTargetCompatibility());
+            }
+        });
+        for (BinarySpec binarySpec : values) {
+            if (binarySpec instanceof JvmBinarySpec) {
+                JvmBinarySpec jvmSpec = (JvmBinarySpec) binarySpec;
+                if (jvmSpec.getTargetPlatform().getTargetCompatibility().compareTo(javaPlatform.getTargetCompatibility())<=0) {
+                    platformToBinary.put(jvmSpec.getTargetPlatform(), jvmSpec);
+                }
+            }
+        }
+        if (platformToBinary.isEmpty()) {
+            return Collections.emptyList();
+        }
+        JavaPlatform first = platformToBinary.keySet().last();
+        return platformToBinary.get(first);
     }
 
     private LibraryResolutionResult doResolve(ProjectInternal project,
