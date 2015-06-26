@@ -148,7 +148,7 @@ class DefaultStaticLibraryBinarySpecTest extends Specification {
             getSource() >> sourceDirSet
             getExportedHeaders() >> headerDirSet
         }
-        binary.addSourceSet sourceSet
+        binary.inputs.add sourceSet
         headerDir
     }
 }

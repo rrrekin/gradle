@@ -119,7 +119,7 @@ class NativeBinarySpecTest extends Specification {
         def sourceSet = Stub(DependentSourceSet) {
             getLibs() >> [lib]
         }
-        binary.addSourceSet sourceSet
+        binary.inputs.add sourceSet
 
         1 * resolver.resolve({ NativeBinaryResolveResult result ->
             result.allResolutions*.input == [lib]
@@ -170,7 +170,7 @@ class NativeBinarySpecTest extends Specification {
         def sourceSet = Stub(DependentSourceSet) {
             getLibs() >> [sourceLib]
         }
-        binary.addSourceSet sourceSet
+        binary.inputs.add sourceSet
         binary.lib(lib2)
 
         and:
