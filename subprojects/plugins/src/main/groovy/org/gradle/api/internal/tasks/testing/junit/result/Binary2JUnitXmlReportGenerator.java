@@ -37,6 +37,7 @@ public class Binary2JUnitXmlReportGenerator {
     private final TestResultsProvider testResultsProvider;
     JUnitXmlResultWriter saxWriter;
     private final static Logger LOG = Logging.getLogger(Binary2JUnitXmlReportGenerator.class);
+    private final static int MAX_FILENAME_BASE_LEN = 200;
 
     public Binary2JUnitXmlReportGenerator(File testResultsDir, TestResultsProvider testResultsProvider, TestOutputAssociation outputAssociation) {
         this.testResultsDir = testResultsDir;
@@ -65,7 +66,12 @@ public class Binary2JUnitXmlReportGenerator {
     }
 
     private String getReportFileName(TestClassResult result) {
-        return "TEST-" + FileUtils.toSafeFileName(result.getClassName()) + ".xml";
+        String outFileName = FileUtils.toSafeFileName(result.getClassName());
+        if(outFileName.length()> MAX_FILENAME_BASE_LEN){
+            String idString = Long.toString(result.getId());
+            outFileName = outFileName.substring(0, MAX_FILENAME_BASE_LEN-idString.length()-1)+"-"+idString;
+        }
+        return "TEST-" + outFileName + ".xml";
     }
 
     private static String getHostname() {
